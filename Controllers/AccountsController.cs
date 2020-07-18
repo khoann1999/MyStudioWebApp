@@ -47,7 +47,7 @@ namespace MyStudioWebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAccount(string id, Account account)
         {
-            if (id != account.Username)
+            if (id != account.UserName)
             {
                 return BadRequest();
             }
@@ -76,7 +76,7 @@ namespace MyStudioWebApi.Controllers
         // POST: api/Accounts
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
+        [HttpPost("Account")]
         public async Task<ActionResult<Account>> PostAccount(Account account)
         {
             _context.Account.Add(account);
@@ -86,7 +86,7 @@ namespace MyStudioWebApi.Controllers
             }
             catch (DbUpdateException)
             {
-                if (AccountExists(account.Username))
+                if (AccountExists(account.UserName))
                 {
                     return Conflict();
                 }
@@ -96,7 +96,23 @@ namespace MyStudioWebApi.Controllers
                 }
             }
 
-            return CreatedAtAction("GetAccount", new { id = account.Username }, account);
+            return CreatedAtAction("GetAccount", new { id = account.UserName }, account);
+        }
+
+        // POST: api/Accounts
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost("Login")]
+        public async Task<ActionResult<Account>> LoginAccount(Account user)
+        {
+            var account = await _context.Account.FirstOrDefaultAsync(result => result.UserName.Equals(user.UserName) && result.Password.Equals(user.Password));
+
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            return account;
         }
 
         // DELETE: api/Accounts/5
@@ -117,7 +133,7 @@ namespace MyStudioWebApi.Controllers
 
         private bool AccountExists(string id)
         {
-            return _context.Account.Any(e => e.Username == id);
+            return _context.Account.Any(e => e.UserName == id);
         }
     }
 }

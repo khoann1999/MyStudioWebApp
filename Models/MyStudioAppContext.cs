@@ -16,24 +16,22 @@ namespace MyStudioWebApi.Models
         }
 
         public virtual DbSet<Account> Account { get; set; }
+        public virtual DbSet<AccountNotification> AccountNotification { get; set; }
         public virtual DbSet<Actor> Actor { get; set; }
+        public virtual DbSet<Notification> Notification { get; set; }
+        public virtual DbSet<Scene> Scene { get; set; }
+        public virtual DbSet<SceneActor> SceneActor { get; set; }
+        public virtual DbSet<SceneTool> SceneTool { get; set; }
+        public virtual DbSet<Tool> Tool { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=SE130046;Database=MyStudioApp;User Id=sa;Password=123;Trusted_Connection=True;");
-            }
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
             {
-                entity.HasKey(e => e.Username);
+                entity.HasKey(e => e.UserName);
 
-                entity.Property(e => e.Username)
+                entity.Property(e => e.UserName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -46,20 +44,123 @@ namespace MyStudioWebApi.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<Actor>(entity =>
+            modelBuilder.Entity<AccountNotification>(entity =>
             {
                 entity.HasNoKey();
 
+                entity.Property(e => e.NotificationId).HasColumnName("NotificationID");
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Notification)
+                    .WithMany()
+                    .HasForeignKey(d => d.NotificationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AccountNotification_Notification");
+
+                entity.HasOne(d => d.UsernameNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.Username)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AccountNotification_Account");
+            });
+
+            modelBuilder.Entity<Actor>(entity =>
+            {
+                entity.HasKey(e => e.UserName);
+
+                entity.Property(e => e.UserName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Email).HasMaxLength(50);
 
-                entity.Property(e => e.Fullname).HasMaxLength(50);
+                entity.Property(e => e.FullName).HasMaxLength(50);
 
                 entity.Property(e => e.Image).HasMaxLength(50);
 
-                entity.Property(e => e.UserId)
-                    .HasColumnName("UserID")
+                entity.HasOne(d => d.UserNameNavigation)
+                    .WithOne(p => p.Actor)
+                    .HasForeignKey<Actor>(d => d.UserName)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Actor_Account");
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.DateTime).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Scene>(entity =>
+            {
+                entity.Property(e => e.SceneId).HasColumnName("SceneID");
+
+                entity.Property(e => e.DateBegin).HasColumnType("datetime");
+
+                entity.Property(e => e.DateEnd).HasColumnType("datetime");
+
+                entity.Property(e => e.SceneName).HasMaxLength(50);
+
+                entity.Property(e => e.SceneScript).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<SceneActor>(entity =>
+            {
+                entity.HasKey(e => e.Username)
+                    .HasName("PK_SceneActor_1");
+
+                entity.Property(e => e.Username)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SceneId).HasColumnName("SceneID");
+
+                entity.HasOne(d => d.Scene)
+                    .WithMany(p => p.SceneActor)
+                    .HasForeignKey(d => d.SceneId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SceneActor_Scene");
+
+                entity.HasOne(d => d.UsernameNavigation)
+                    .WithOne(p => p.SceneActor)
+                    .HasForeignKey<SceneActor>(d => d.Username)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SceneActor_Actor");
+            });
+
+            modelBuilder.Entity<SceneTool>(entity =>
+            {
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.SceneId).HasColumnName("SceneID");
+
+                entity.Property(e => e.ToolId).HasColumnName("ToolID");
+
+                entity.HasOne(d => d.Scene)
+                    .WithMany(p => p.SceneTool)
+                    .HasForeignKey(d => d.SceneId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SceneTool_Scene1");
+
+                entity.HasOne(d => d.Tool)
+                    .WithMany(p => p.SceneTool)
+                    .HasForeignKey(d => d.ToolId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SceneTool_Tool");
+            });
+
+            modelBuilder.Entity<Tool>(entity =>
+            {
+                entity.Property(e => e.ToolId).HasColumnName("ToolID");
+
+                entity.Property(e => e.Image).HasMaxLength(50);
+
+                entity.Property(e => e.ToolName).HasMaxLength(50);
             });
 
             OnModelCreatingPartial(modelBuilder);

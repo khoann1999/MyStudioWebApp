@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,8 +29,10 @@ namespace MyStudioWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            services.AddDbContext<MyStudioAppContext>();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            ); ;
+            services.AddDbContext<MyStudioAppContext>(option => option.UseSqlServer(Configuration.GetConnectionString("MyStudioDB")));
             services.AddCors(options => options.AddPolicy(ApiPolicy,
            builder =>
            {
@@ -61,6 +64,7 @@ namespace MyStudioWebApi
 
             app.UseAuthorization();
             app.UseCors(ApiPolicy);
+            app.UseStaticFiles();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
