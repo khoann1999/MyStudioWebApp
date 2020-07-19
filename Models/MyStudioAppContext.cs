@@ -50,7 +50,7 @@ namespace MyStudioWebApi.Models
 
                 entity.Property(e => e.NotificationId).HasColumnName("NotificationID");
 
-                entity.Property(e => e.Username)
+                entity.Property(e => e.UserName)
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -61,9 +61,9 @@ namespace MyStudioWebApi.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AccountNotification_Notification");
 
-                entity.HasOne(d => d.UsernameNavigation)
+                entity.HasOne(d => d.UserNameNavigation)
                     .WithMany()
-                    .HasForeignKey(d => d.Username)
+                    .HasForeignKey(d => d.UserName)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AccountNotification_Account");
             });
@@ -111,10 +111,10 @@ namespace MyStudioWebApi.Models
 
             modelBuilder.Entity<SceneActor>(entity =>
             {
-                entity.HasKey(e => e.Username)
+                entity.HasKey(e => e.UserName)
                     .HasName("PK_SceneActor_1");
 
-                entity.Property(e => e.Username)
+                entity.Property(e => e.UserName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -126,9 +126,9 @@ namespace MyStudioWebApi.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SceneActor_Scene");
 
-                entity.HasOne(d => d.UsernameNavigation)
+                entity.HasOne(d => d.UserNameNavigation)
                     .WithOne(p => p.SceneActor)
-                    .HasForeignKey<SceneActor>(d => d.Username)
+                    .HasForeignKey<SceneActor>(d => d.UserName)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SceneActor_Actor");
             });

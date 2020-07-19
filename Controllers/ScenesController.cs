@@ -142,7 +142,7 @@ namespace MyStudioWebApi.Controllers
                     throw;
             }
 
-            return CreatedAtAction("GetSceneTool", new { id = sceneActor.Username }, sceneActor);
+            return CreatedAtAction("GetSceneTool", new { id = sceneActor.UserName }, sceneActor);
         }
         // GET: api/Scenes/5
         [HttpGet("GetPosts/{id}")]
