@@ -184,6 +184,34 @@ namespace MyStudioWebApi.Controllers
             return CreatedAtAction("GetSceneTool", new { id = sceneTool.Id }, sceneTool);
         }
 
+        // GET: api/Scenes/5
+        [HttpGet("GetCurrentScenes/{userName}")]
+        public  ActionResult<List<Scene>> GetCurrentScenes(string userName)
+        {
+            var scene = _context.Scene
+                .Where(result => result.SceneActor.Any(result => result.UserName.Equals(userName)) && result.DateEnd >= DateTime.Now).ToList();
+            if (scene == null)
+            {
+                return NotFound();
+            }
+
+            return scene;
+        }
+
+        // GET: api/Scenes/5
+        [HttpGet("GetHistoryScenes/{userName}")]
+        public ActionResult<List<Scene>> GetHistoryScenes(string userName)
+        {
+            var scene = _context.Scene.Where(result => result.SceneActor.Any(result => result.UserName.Equals(userName)) && result.DateEnd < DateTime.Now).ToList();
+
+            if (scene == null)
+            {
+                return NotFound();
+            }
+
+            return scene;
+        }
+
         // POST: api/Tools/UploadImage
         [HttpPost("UploadImage"), DisableRequestSizeLimit]
         public IActionResult UploadPostImage()

@@ -24,7 +24,6 @@ namespace MyStudioWebApi.Models
         public virtual DbSet<SceneTool> SceneTool { get; set; }
         public virtual DbSet<Tool> Tool { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -111,14 +110,14 @@ namespace MyStudioWebApi.Models
 
             modelBuilder.Entity<SceneActor>(entity =>
             {
-                entity.HasKey(e => e.UserName)
-                    .HasName("PK_SceneActor_1");
-
-                entity.Property(e => e.UserName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.SceneId).HasColumnName("SceneID");
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.Scene)
                     .WithMany(p => p.SceneActor)
@@ -127,8 +126,8 @@ namespace MyStudioWebApi.Models
                     .HasConstraintName("FK_SceneActor_Scene");
 
                 entity.HasOne(d => d.UserNameNavigation)
-                    .WithOne(p => p.SceneActor)
-                    .HasForeignKey<SceneActor>(d => d.UserName)
+                    .WithMany(p => p.SceneActor)
+                    .HasForeignKey(d => d.UserName)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SceneActor_Actor");
             });

@@ -5,6 +5,7 @@ namespace MyStudioWebApi.Models
 {
     public partial class SceneActor
     {
+        public int Id { get; set; }
         public int SceneId { get; set; }
         public string UserName { get; set; }
 
