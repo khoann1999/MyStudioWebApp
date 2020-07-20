@@ -24,6 +24,8 @@ namespace MyStudioWebApi.Models
         public virtual DbSet<SceneTool> SceneTool { get; set; }
         public virtual DbSet<Tool> Tool { get; set; }
 
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -45,25 +47,25 @@ namespace MyStudioWebApi.Models
 
             modelBuilder.Entity<AccountNotification>(entity =>
             {
-                entity.HasNoKey();
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
 
-                entity.Property(e => e.NotificationId).HasColumnName("NotificationID");
+                entity.Property(e => e.NoticationId).HasColumnName("NoticationID");
 
                 entity.Property(e => e.UserName)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Notification)
-                    .WithMany()
-                    .HasForeignKey(d => d.NotificationId)
+                entity.HasOne(d => d.Notication)
+                    .WithMany(p => p.AccountNotification)
+                    .HasForeignKey(d => d.NoticationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AccountNotification_Notification");
 
                 entity.HasOne(d => d.UserNameNavigation)
-                    .WithMany()
+                    .WithMany(p => p.AccountNotification)
                     .HasForeignKey(d => d.UserName)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AccountNotification_Account");
             });
 
@@ -93,6 +95,11 @@ namespace MyStudioWebApi.Models
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.DateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Scene>(entity =>

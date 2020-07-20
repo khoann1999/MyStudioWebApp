@@ -109,12 +109,14 @@ namespace MyStudioWebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Tool>> DeleteTool(int id)
         {
+            var sceneTool = _context.SceneTool.Where(result => result.ToolId.Equals(id)).Include(result => result.Tool);
             var tool = await _context.Tool.FindAsync(id);
             if (tool == null)
             {
                 return NotFound();
             }
 
+            _context.SceneTool.RemoveRange(sceneTool);
             _context.Tool.Remove(tool);
             await _context.SaveChangesAsync();
 

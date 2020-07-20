@@ -95,13 +95,18 @@ namespace MyStudioWebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Scene>> DeleteScene(int id)
         {
+            var sceneActors = _context.SceneActor.Where(result => result.SceneId.Equals(id)).Include(result => result.UserNameNavigation);
+            var sceneTool = _context.SceneTool.Where(result => result.SceneId.Equals(id)).Include(result => result.Tool);
             var scene = await _context.Scene.FindAsync(id);
             if (scene == null)
             {
                 return NotFound();
             }
 
+            _context.SceneActor.RemoveRange(sceneActors);
+            _context.SceneTool.RemoveRange(sceneTool);
             _context.Scene.Remove(scene);
+           
             await _context.SaveChangesAsync();
 
             return scene;
